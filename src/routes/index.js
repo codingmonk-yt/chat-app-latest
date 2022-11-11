@@ -45,6 +45,6 @@ const Chats = Loadable(
   lazy(() => import("../pages/dashboard/Chats")),
 );
 const Contact = Loadable(
-  lazy(() => import("../pages/dashboard/Contact")),
+  lazy(() => import("../sections/dashboard/Contact")),
 );
 const Page404 = Loadable(lazy(() => import("../pages/Page404")));

@@ -13,9 +13,9 @@ import {
   ReplyMsg,
   TextMsg,
   Timeline,
-} from "../../sections/Dashboard/Conversation";
+} from "../../sections/dashboard/Conversation";
 
-const Conversation = ({ isMobile }) => {
+const Conversation = ({ isMobile, starred }) => {
   return (
     <Box p={isMobile ? 1 : 3}>
       <Stack spacing={3}>
@@ -43,7 +43,7 @@ const Conversation = ({ isMobile }) => {
                 case "link":
                   return (
                     //  Link Message
-                    <LinkMsg el={el} />
+                    <LinkMsg el={el} starred={starred} />
                   );
 
                 case "reply":
@@ -107,3 +107,5 @@ const ChatComponent = () => {
 };
 
 export default ChatComponent;
+
+export {Conversation};

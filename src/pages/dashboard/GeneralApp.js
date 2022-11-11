@@ -5,13 +5,18 @@ import { Box, Stack, Typography } from "@mui/material";
 import { Link, useSearchParams } from "react-router-dom";
 import ChatComponent from "./Conversation";
 import Chats from "./Chats";
-import Contact from "./Contact";
+import Contact from "../../sections/dashboard/Contact";
 import NoChat from "../../assets/Illustration/NoChat";
+import { useSelector } from "react-redux";
+import StarredMessages from "../../sections/dashboard/StarredMessages";
+import Media from "../../sections/dashboard/SharedMessages";
 
 const GeneralApp = () => {
   const [searchParams] = useSearchParams();
 
   const theme = useTheme();
+
+  const { sideBar } = useSelector((state) => state.app);
 
   return (
     <>
@@ -20,10 +25,7 @@ const GeneralApp = () => {
         <Box
           sx={{
             height: "100%",
-            width:
-              searchParams.get("open") === "true"
-                ? `calc(100vw - 740px )`
-                : "calc(100vw - 420px )",
+            width: sideBar.open ? `calc(100vw - 740px )` : "calc(100vw - 420px )",
             backgroundColor:
               theme.palette.mode === "light"
                 ? "#FFF"
@@ -45,11 +47,14 @@ const GeneralApp = () => {
               alignItems="center"
               justifyContent={"center"}
             >
-              <NoChat  />
+              <NoChat />
               <Typography variant="subtitle2">
                 Select a conversation or start a{" "}
                 <Link
-                  style={{ color: theme.palette.primary.main, textDecoration: "none" }}
+                  style={{
+                    color: theme.palette.primary.main,
+                    textDecoration: "none",
+                  }}
                   to="/"
                 >
                   new one
@@ -58,10 +63,28 @@ const GeneralApp = () => {
             </Stack>
           )}
         </Box>
-        {searchParams.get("open") === "true" && (
+        {sideBar.open &&
+    
+          (() => {
+            switch (sideBar.type) {
+              case "CONTACT":
+                return <Contact />;
+
+              case "STARRED":
+                return <StarredMessages />;
+
+              case "SHARED":
+                return <Media />;
+
+              default:
+                break;
+            }
+          })()
           //  Contact Info
-          <Contact />
-        )}
+          //
+
+          //
+        }
       </Stack>
     </>
   );

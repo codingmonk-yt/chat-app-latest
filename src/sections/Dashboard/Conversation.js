@@ -12,6 +12,7 @@ import { useTheme, alpha } from "@mui/material/styles";
 import { DotsThreeVertical, DownloadSimple, Image } from "phosphor-react";
 import { Message_options } from "../../data";
 import { Link } from "react-router-dom";
+import truncateString from "../../utils/truncate";
 
 const MessageOption = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -51,7 +52,7 @@ const MessageOption = () => {
   );
 };
 
-const TextMsg = ({el}) => {
+const TextMsg = ({ el }) => {
   const theme = useTheme();
   return (
     <Stack direction="row" justifyContent={el.incoming ? "start" : "end"}>
@@ -77,7 +78,7 @@ const TextMsg = ({el}) => {
     </Stack>
   );
 };
-const MediaMsg = ({el}) => {
+const MediaMsg = ({ el }) => {
   const theme = useTheme();
   return (
     <Stack direction="row" justifyContent={el.incoming ? "start" : "end"}>
@@ -110,7 +111,7 @@ const MediaMsg = ({el}) => {
     </Stack>
   );
 };
-const DocMsg = ({el}) => {
+const DocMsg = ({ el }) => {
   const theme = useTheme();
   return (
     <Stack direction="row" justifyContent={el.incoming ? "start" : "end"}>
@@ -154,7 +155,7 @@ const DocMsg = ({el}) => {
     </Stack>
   );
 };
-const LinkMsg = ({el}) => {
+const LinkMsg = ({ el }) => {
   const theme = useTheme();
   return (
     <Stack direction="row" justifyContent={el.incoming ? "start" : "end"}>
@@ -174,7 +175,7 @@ const LinkMsg = ({el}) => {
             p={2}
             direction="column"
             spacing={3}
-            alignItems="center"
+            alignItems="start"
             sx={{
               backgroundColor: theme.palette.background.paper,
               borderRadius: 1,
@@ -186,7 +187,7 @@ const LinkMsg = ({el}) => {
               style={{ maxHeight: 210, borderRadius: "10px" }}
             />
             <Stack direction={"column"} spacing={2}>
-              <Typography variant="subtitle2">
+              <Typography variant="subtitle2" textAlign={"start"}>
                 Creating Chat App using MERN
               </Typography>
               <Typography
@@ -195,7 +196,7 @@ const LinkMsg = ({el}) => {
                 variant="subtitle2"
                 sx={{ color: theme.palette.primary.main }}
               >
-                www.youtube.com/watch/v12uqywHTY2
+                {truncateString("www.youtube.com/watch/v12uqywHTY2", 16)}
               </Typography>
             </Stack>
           </Stack>
@@ -211,7 +212,7 @@ const LinkMsg = ({el}) => {
     </Stack>
   );
 };
-const ReplyMsg = ({el}) => {
+const ReplyMsg = ({ el }) => {
   const theme = useTheme();
   return (
     <Stack direction="row" justifyContent={el.incoming ? "start" : "end"}>
@@ -254,7 +255,7 @@ const ReplyMsg = ({el}) => {
     </Stack>
   );
 };
-const Timeline = ({el}) => {
+const Timeline = ({ el }) => {
   const theme = useTheme();
   return (
     <Stack direction="row" alignItems={"center"} justifyContent="space-between">
