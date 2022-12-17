@@ -25,7 +25,9 @@ const GeneralApp = () => {
         <Box
           sx={{
             height: "100%",
-            width: sideBar.open ? `calc(100vw - 740px )` : "calc(100vw - 420px )",
+            width: sideBar.open
+              ? `calc(100vw - 740px )`
+              : "calc(100vw - 420px )",
             backgroundColor:
               theme.palette.mode === "light"
                 ? "#FFF"
@@ -63,27 +65,23 @@ const GeneralApp = () => {
             </Stack>
           )}
         </Box>
-        {sideBar.open &&
-    
-          (() => {
-            switch (sideBar.type) {
-              case "CONTACT":
-                return <Contact />;
+        {
+          sideBar.open &&
+            (() => {
+              switch (sideBar.type) {
+                case "CONTACT":
+                  return <Contact />;
 
-              case "STARRED":
-                return <StarredMessages />;
+                case "STARRED":
+                  return <StarredMessages />;
 
-              case "SHARED":
-                return <Media />;
+                case "SHARED":
+                  return <Media />;
 
-              default:
-                break;
-            }
-          })()
-          //  Contact Info
-          //
-
-          //
+                default:
+                  break;
+              }
+            })()
         }
       </Stack>
     </>

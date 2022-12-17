@@ -121,7 +121,10 @@ const SideBar = () => {
           </Stack>
         </Stack>
         <Stack spacing={4}>
-          <AntSwitch defaultChecked onChange={onToggleMode} />
+          <AntSwitch
+            defaultChecked={theme.palette.mode === "dark"}
+            onChange={onToggleMode}
+          />
           {/* Profile Menu */}
           <ProfileMenu />
         </Stack>

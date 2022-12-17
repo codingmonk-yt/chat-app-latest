@@ -24,6 +24,7 @@ export default function Router() {
       children: [
         { element: <Navigate to={DEFAULT_PATH} replace />, index: true },
         { path: "app", element: <GeneralApp /> },
+        { path: "settings", element: <Settings /> },
         { path: "conversation", element: <Conversation /> },
         { path: "chats", element: <Chats /> },
         { path: "contact", element: <Contact /> },
@@ -48,3 +49,4 @@ const Contact = Loadable(
   lazy(() => import("../sections/dashboard/Contact")),
 );
 const Page404 = Loadable(lazy(() => import("../pages/Page404")));
+const Settings = Loadable(lazy(() => import("../pages/dashboard/Settings")));

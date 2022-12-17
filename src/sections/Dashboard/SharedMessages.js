@@ -12,7 +12,7 @@ import {
 import { ArrowLeft } from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
 import { useDispatch } from "react-redux";
-import { ToggleSidebar, UpdateSidebarType } from "../../redux/slices/app";
+import { UpdateSidebarType } from "../../redux/slices/app";
 import { faker } from "@faker-js/faker";
 import { DocMsg, LinkMsg } from "./Conversation";
 import { Shared_docs, Shared_links } from "../../data";
