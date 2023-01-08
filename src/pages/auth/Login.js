@@ -3,7 +3,6 @@ import { Link as RouterLink } from 'react-router-dom';
 import { Stack, Typography, Link } from "@mui/material";
 import AuthSocial from "../../sections/auth/AuthSocial";
 import Login from "../../sections/auth/LoginForm";
-import { SettingsContext } from '../../contexts/SettingsContext';
 
 // ----------------------------------------------------------------------
 
@@ -11,7 +10,7 @@ export default function LoginPage() {
 
   return (
     <>
-    <SettingsContext.Consumer >
+    
       <Stack spacing={2} sx={{ mb: 5, position: "relative" }}>
         <Typography variant="h4">Login to Tawk</Typography>
 
@@ -27,7 +26,7 @@ export default function LoginPage() {
       <Login />
 
       <AuthSocial />
-      </SettingsContext.Consumer>
+     
     </>
   );
 }
