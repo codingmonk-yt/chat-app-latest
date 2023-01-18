@@ -1,15 +1,18 @@
-import { Box, Divider, IconButton, Stack } from "@mui/material";
 import React from "react";
 import { useTheme } from "@mui/material/styles";
+import { useDispatch } from "react-redux";
+import { Box, Divider, IconButton, Stack } from "@mui/material";
 import AntSwitch from "../../components/AntSwitch";
 
 import Logo from "../../assets/Images/logo.ico";
 
 import useSettings from "../../hooks/useSettings";
 import { Nav_Buttons, Nav_Setting } from "../../data";
+
 import ProfileMenu from "./ProfileMenu";
 
 const SideBar = () => {
+  const dispatch = useDispatch();
   const theme = useTheme();
 
   const { onToggleMode } = useSettings();
@@ -66,7 +69,12 @@ const SideBar = () => {
                   }}
                   p={1}
                 >
-                  <IconButton sx={{ width: "max-content", color: "#ffffff" }}>
+                  <IconButton
+                    onClick={() => {
+                      // dispatch(UpdateTab(el.index));
+                    }}
+                    sx={{ width: "max-content", color: "#ffffff" }}
+                  >
                     {el.icon}
                   </IconButton>
                 </Box>
@@ -74,6 +82,8 @@ const SideBar = () => {
                 <IconButton
                   onClick={() => {
                     handleChangeTab(el.index);
+
+                    // dispatch(UpdateTab(el.index));
                   }}
                   sx={{
                     width: "max-content",
@@ -97,7 +107,12 @@ const SideBar = () => {
                   }}
                   p={1}
                 >
-                  <IconButton sx={{ width: "max-content", color: "#ffffff" }}>
+                  <IconButton
+                    onClick={() => {
+                      // dispatch(UpdateTab(el.index));
+                    }}
+                    sx={{ width: "max-content", color: "#ffffff" }}
+                  >
                     {el.icon}
                   </IconButton>
                 </Box>
@@ -105,6 +120,8 @@ const SideBar = () => {
                 <IconButton
                   onClick={() => {
                     handleChangeTab(el.index);
+
+                    // dispatch(UpdateTab(el.index));
                   }}
                   sx={{
                     width: "max-content",
