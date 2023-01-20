@@ -1,16 +1,17 @@
-
 import React from "react";
 import { Stack } from "@mui/material";
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import useResponsive from "../../hooks/useResponsive";
 import SideNav from "./SideNav";
 
-
 const DashboardLayout = () => {
-
   const isDesktop = useResponsive("up", "md");
 
-  
+  const isAuthenticated = false;
+
+  if (!isAuthenticated) {
+    return <Navigate to={"/auth/login"} />;
+  }
 
   return (
     <>

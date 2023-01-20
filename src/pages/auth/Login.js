@@ -9,7 +9,6 @@ import Login from "../../sections/auth/LoginForm";
 export default function LoginPage() {
   return (
     <>
-    
       <Stack spacing={2} sx={{ mb: 5, position: "relative" }}>
         <Typography variant="h4">Login to Tawk</Typography>
 
@@ -29,7 +28,6 @@ export default function LoginPage() {
       <Login />
 
       <AuthSocial />
-     
     </>
   );
 }

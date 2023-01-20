@@ -1,6 +1,6 @@
 import React from "react";
 import { useTheme } from "@mui/material/styles";
-import { useDispatch } from "react-redux";
+
 import { Box, Divider, IconButton, Stack } from "@mui/material";
 import AntSwitch from "../../components/AntSwitch";
 
@@ -10,10 +10,31 @@ import useSettings from "../../hooks/useSettings";
 import { Nav_Buttons, Nav_Setting } from "../../data";
 
 import ProfileMenu from "./ProfileMenu";
+import { useNavigate } from "react-router-dom";
+
+const getPath = (index) => {
+  switch (index) {
+    case 0:
+      return "/app";
+
+    case 1:
+      return "/group";
+
+    case 2:
+      return "/call";
+
+    case 3:
+      return "/settings";
+
+    default:
+      break;
+  }
+};
 
 const SideBar = () => {
-  const dispatch = useDispatch();
   const theme = useTheme();
+
+  const navigate = useNavigate();
 
   const { onToggleMode } = useSettings();
 
@@ -21,6 +42,7 @@ const SideBar = () => {
 
   const handleChangeTab = (index) => {
     setSelectedTab(index);
+    navigate(getPath(index));
   };
 
   return (
@@ -70,9 +92,7 @@ const SideBar = () => {
                   p={1}
                 >
                   <IconButton
-                    onClick={() => {
-                      // dispatch(UpdateTab(el.index));
-                    }}
+                    onClick={() => {}}
                     sx={{ width: "max-content", color: "#ffffff" }}
                   >
                     {el.icon}
@@ -82,8 +102,6 @@ const SideBar = () => {
                 <IconButton
                   onClick={() => {
                     handleChangeTab(el.index);
-
-                    // dispatch(UpdateTab(el.index));
                   }}
                   sx={{
                     width: "max-content",
