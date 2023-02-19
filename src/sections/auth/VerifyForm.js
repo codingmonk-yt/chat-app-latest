@@ -16,7 +16,7 @@ import { VerifyEmail } from "../../redux/slices/auth";
 
 export default function VerifyForm() {
   const dispatch = useDispatch();
-  const {email} = useSelector((state) => state.auth);
+  const { email } = useSelector((state) => state.auth);
   const VerifyCodeSchema = Yup.object().shape({
     code1: Yup.string().required("Code is required"),
     code2: Yup.string().required("Code is required"),
@@ -49,10 +49,12 @@ export default function VerifyForm() {
   const onSubmit = async (data) => {
     try {
       //   Send API Request
-      dispatch(VerifyEmail({
-        email,
-        otp: `${data.code1}${data.code2}${data.code3}${data.code4}${data.code5}${data.code6}`
-      }));
+      dispatch(
+        VerifyEmail({
+          email,
+          otp: `${data.code1}${data.code2}${data.code3}${data.code4}${data.code5}${data.code6}`,
+        })
+      );
     } catch (error) {
       console.error(error);
     }
@@ -66,7 +68,6 @@ export default function VerifyForm() {
           inputs={["code1", "code2", "code3", "code4", "code5", "code6"]}
         />
 
-        
         <Button
           fullWidth
           size="large"

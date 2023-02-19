@@ -1,11 +1,12 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
+import axios from "../../utils/axios";
 
 // ----------------------------------------------------------------------
 
 const initialState = {
   sideBar: {
     open: false,
-    type: 'CONTACT', // can be CONTACT, STARRED, SHARED
+    type: "CONTACT", // can be CONTACT, STARRED, SHARED
   },
   isLoggedIn: true,
   tab: 0, // [0, 1, 2, 3]
@@ -14,10 +15,13 @@ const initialState = {
     severity: null,
     message: null,
   },
+  users: [], // all users of app who are not friends and not requested yet
+  friends: [], // all friends
+  friendRequests: [], // all friend requests
 };
 
 const slice = createSlice({
-  name: 'app',
+  name: "app",
   initialState,
   reducers: {
     // Toggle Sidebar
@@ -32,16 +36,18 @@ const slice = createSlice({
     },
 
     openSnackBar(state, action) {
-
       console.log(action.payload);
       state.snackbar.open = true;
       state.snackbar.severity = action.payload.severity;
       state.snackbar.message = action.payload.message;
     },
     closeSnackBar(state) {
-      console.log('This is getting executed');
+      console.log("This is getting executed");
       state.snackbar.open = false;
       state.snackbar.message = null;
+    },
+    updateUsers(state, action) {
+      state.users = action.payload.users;
     },
   },
 });
@@ -55,18 +61,20 @@ export const closeSnackBar = () => async (dispatch, getState) => {
   dispatch(slice.actions.closeSnackBar());
 };
 
-export const showSnackbar = ({severity, message}) => async (dispatch, getState) => {
-  dispatch(
-    slice.actions.openSnackBar({
-      message,
-      severity,
-    }),
-  );
+export const showSnackbar =
+  ({ severity, message }) =>
+  async (dispatch, getState) => {
+    dispatch(
+      slice.actions.openSnackBar({
+        message,
+        severity,
+      })
+    );
 
-  setTimeout(() => {
-    dispatch(slice.actions.closeSnackBar());
-  }, 4000);
-};
+    setTimeout(() => {
+      dispatch(slice.actions.closeSnackBar());
+    }, 4000);
+  };
 
 export function ToggleSidebar() {
   return async (dispatch, getState) => {
@@ -81,5 +89,28 @@ export function UpdateSidebarType(type) {
 export function UpdateTab(tab) {
   return async (dispatch, getState) => {
     dispatch(slice.actions.updateTab({ tab }));
+  };
+}
+
+export function FetchUsers() {
+  return async (dispatch, getState) => {
+    await axios
+      .get(
+        "/user/get-all",
+
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getState().auth.token}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response);
+        dispatch(slice.actions.updateUsers({ users: response.data.data }));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 }

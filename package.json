@@ -33,6 +33,7 @@
     "redux": "^4.2.0",
     "redux-persist": "^6.0.0",
     "simplebar-react": "^2.4.3",
+    "socket.io-client": "^4.6.0",
     "stylis-plugin-rtl": "^2.0.2",
     "web-vitals": "^2.1.4",
     "yup": "^0.32.11"
