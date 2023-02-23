@@ -10,7 +10,6 @@ import NoChat from "../../assets/Illustration/NoChat";
 import { useSelector } from "react-redux";
 import StarredMessages from "../../sections/dashboard/StarredMessages";
 import Media from "../../sections/dashboard/SharedMessages";
-import socket from "../../socket";
 
 const GeneralApp = () => {
   const [searchParams] = useSearchParams();
@@ -18,11 +17,6 @@ const GeneralApp = () => {
   const theme = useTheme();
 
   const { sideBar } = useSelector((state) => state.app);
-
-  // Add this
-  const joinRoom = () => {
-    socket.emit("hello", { message: "Hi there" });
-  };
 
   return (
     <>
