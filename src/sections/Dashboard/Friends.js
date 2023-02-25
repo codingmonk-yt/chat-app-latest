@@ -1,46 +1,77 @@
 import React, { useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Slide,
-  Stack,
-  Tab,
-  Tabs,
-} from "@mui/material";
-import {
-  Search,
-  SearchIconWrapper,
-  StyledInputBase,
-} from "../../components/Search";
-import { MagnifyingGlass } from "phosphor-react";
-import { CallElement } from "../../components/CallElement";
-import { CallList } from "../../data";
+import { Dialog, DialogContent, Slide, Stack, Tab, Tabs } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { FetchUsers } from "../../redux/slices/app";
-import { UserElement } from "../../components/UserElement";
+import {
+  FetchFriendRequests,
+  FetchFriends,
+  FetchUsers,
+} from "../../redux/slices/app";
+import { FriendElement, FriendRequestElement, UserElement } from "../../components/UserElement";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-
-
-const Friends = ({ open, handleClose }) => {
+const UsersList = () => {
   const dispatch = useDispatch();
-  const [value, setValue] = React.useState(0);
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+  const { users } = useSelector((state) => state.app);
 
   useEffect(() => {
     dispatch(FetchUsers());
   }, []);
 
-  const {users} = useSelector((state) => state.app);
+  return (
+    <>
+      {users.map((el, idx) => {
+        return <UserElement key={idx} {...el} />;
+      })}
+    </>
+  );
+};
 
-  console.log(users);
+const FriendsList = () => {
+  const dispatch = useDispatch();
+
+  const { friends } = useSelector((state) => state.app);
+
+  useEffect(() => {
+    dispatch(FetchFriends());
+  }, []);
+
+  return (
+    <>
+      {friends.map((el, idx) => {
+        return <FriendElement key={idx} {...el} />;
+      })}
+    </>
+  );
+};
+
+const RequestsList = () => {
+  const dispatch = useDispatch();
+
+  const { friendRequests } = useSelector((state) => state.app);
+
+  useEffect(() => {
+    dispatch(FetchFriendRequests());
+  }, []);
+
+  return (
+    <>
+      {friendRequests.map((el, idx) => {
+        return <FriendRequestElement key={idx} {...el} />;
+      })}
+    </>
+  );
+};
+
+const Friends = ({ open, handleClose }) => {
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
   return (
     <Dialog
@@ -55,15 +86,6 @@ const Friends = ({ open, handleClose }) => {
     >
       {/* <DialogTitle>{"Friends"}</DialogTitle> */}
       <Stack p={2} sx={{ width: "100%" }}>
-        {/* <Search>
-          <SearchIconWrapper>
-            <MagnifyingGlass color="#709CE6" />
-          </SearchIconWrapper>
-          <StyledInputBase
-            placeholder="Search…"
-            inputProps={{ "aria-label": "search" }}
-          />
-        </Search> */}
         <Tabs value={value} onChange={handleChange} centered>
           <Tab label="Explore" />
           <Tab label="Friends" />
@@ -74,24 +96,20 @@ const Friends = ({ open, handleClose }) => {
         <Stack sx={{ height: "100%" }}>
           <Stack spacing={2.4}>
             {(() => {
-                switch (value) {
-                    case 0:
-                       return users.map((el, idx) => {
-                            return <UserElement key={idx} {...el} />;
-                          })
-                        break;
-                    case 1:
-                        return <></>
-                        break;
-                    case 2:
-                        return <></>
-                        break;
-                
-                    default:
-                        break;
-                }
+              switch (value) {
+                case 0: // display all users in this list
+                  return <UsersList />;
+
+                case 1: // display friends in this list
+                  return <FriendsList />;
+
+                case 2: // display request in this list
+                  return <RequestsList />;
+
+                default:
+                  break;
+              }
             })()}
-            
           </Stack>
         </Stack>
       </DialogContent>
