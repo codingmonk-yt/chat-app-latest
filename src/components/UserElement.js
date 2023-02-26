@@ -9,14 +9,9 @@ import {
   Button,
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  VideoCamera,
-  Phone,
-  Chat,
-} from "phosphor-react";
-import socket from "../socket";
+import { Chat } from "phosphor-react";
+import { useSelector } from "react-redux";
+import { socket } from "../socket";
 
 const StyledChatBox = styled(Box)(({ theme }) => ({
   "&:hover": {
@@ -62,6 +57,7 @@ const UserElement = ({
   online,
   _id,
 }) => {
+  const { user_id } = useSelector((state) => state.auth);
   const theme = useTheme();
 
   const name = `${firstName} ${lastName}`;
@@ -102,7 +98,7 @@ const UserElement = ({
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
           <Button
             onClick={() => {
-              socket.emit("friend_request", { to: _id }, () => {
+              socket.emit("friend_request", { to: _id, from: user_id }, () => {
                 alert("request sent");
               });
             }}
@@ -122,7 +118,7 @@ const FriendRequestElement = ({
   incoming,
   missed,
   online,
-  _id,
+  id,
 }) => {
   const theme = useTheme();
 
@@ -164,7 +160,8 @@ const FriendRequestElement = ({
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
           <Button
             onClick={() => {
-            //  emit "accept_request" event
+              //  emit "accept_request" event
+              // socket.emit("accept_request", { request_id: id });
             }}
           >
             Accept Request
@@ -224,12 +221,12 @@ const FriendElement = ({
           </Stack>
         </Stack>
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
-          <IconButton onClick={() => {
-            // start a new conversation
-          }}>
-
+          <IconButton
+            onClick={() => {
+              // start a new conversation
+            }}
+          >
             <Chat />
-
           </IconButton>
         </Stack>
       </Stack>
