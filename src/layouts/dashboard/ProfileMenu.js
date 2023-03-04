@@ -19,6 +19,8 @@ const ProfileMenu = () => {
     setAnchorEl(null);
   };
 
+  const user_id = window.localStorage.getItem("user_id");
+
   return (
     <>
       <Avatar
@@ -57,7 +59,7 @@ const ProfileMenu = () => {
                   onClick={() => {
                     if (idx === 2) {
                       dispatch(LogoutUser());
-                      socket.emit("end");
+                      socket.emit("end", {user_id});
                     }
                   }}
                   sx={{ width: 100 }}

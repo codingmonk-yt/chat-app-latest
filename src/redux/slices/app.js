@@ -18,7 +18,8 @@ const initialState = {
   users: [], // all users of app who are not friends and not requested yet
   friends: [], // all friends
   friendRequests: [], // all friend requests
-  socket: null,
+  chat_type: null,
+  room_id: null,
 };
 
 const slice = createSlice({
@@ -56,9 +57,10 @@ const slice = createSlice({
     updateFriendRequests(state, action) {
       state.friendRequests = action.payload.requests;
     },
-    updateSocket(state, action) {
-      state.socket = action.payload.socket;
-    }
+    selectConversation(state, action) {
+      state.chat_type = "individual";
+      state.room_id = action.payload.room_id;
+    },
   },
 });
 
@@ -106,7 +108,7 @@ export function FetchUsers() {
   return async (dispatch, getState) => {
     await axios
       .get(
-        "/user/get-all",
+        "/user/get-users",
 
         {
           headers: {
@@ -171,8 +173,8 @@ export function FetchFriendRequests() {
   };
 }
 
-export function updateSocket(socket) {
-    return async (dispatch, getState) => {
-      dispatch(slice.actions.updateSocket({socket}));
-    }
-}
+export const SelectConversation = ({ room_id }) => {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.selectConversation({ room_id }));
+  };
+};

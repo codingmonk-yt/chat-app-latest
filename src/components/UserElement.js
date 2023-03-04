@@ -10,8 +10,9 @@ import {
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
 import { Chat } from "phosphor-react";
-import { useSelector } from "react-redux";
 import { socket } from "../socket";
+
+const user_id = window.localStorage.getItem("user_id");
 
 const StyledChatBox = styled(Box)(({ theme }) => ({
   "&:hover": {
@@ -48,16 +49,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 
-const UserElement = ({
-  img,
-  firstName,
-  lastName,
-  incoming,
-  missed,
-  online,
-  _id,
-}) => {
-  const { user_id } = useSelector((state) => state.auth);
+const UserElement = ({ img, firstName, lastName, online, _id }) => {
   const theme = useTheme();
 
   const name = `${firstName} ${lastName}`;
@@ -161,7 +153,7 @@ const FriendRequestElement = ({
           <Button
             onClick={() => {
               //  emit "accept_request" event
-              // socket.emit("accept_request", { request_id: id });
+              socket.emit("accept_request", { request_id: id });
             }}
           >
             Accept Request
@@ -224,6 +216,7 @@ const FriendElement = ({
           <IconButton
             onClick={() => {
               // start a new conversation
+              socket.emit("start_conversation", { to: _id, from: user_id });
             }}
           >
             <Chat />

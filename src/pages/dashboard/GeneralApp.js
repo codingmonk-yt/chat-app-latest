@@ -16,7 +16,7 @@ const GeneralApp = () => {
 
   const theme = useTheme();
 
-  const { sideBar } = useSelector((state) => state.app);
+  const { sideBar, room_id, chat_type } = useSelector((state) => state.app);
 
   return (
     <>
@@ -39,8 +39,8 @@ const GeneralApp = () => {
                 : "6px solid #0162C4",
           }}
         >
-          {searchParams.get("type") === "individual-chat" &&
-          searchParams.get("id") ? (
+          {chat_type === "individual" &&
+          room_id !== null ? (
             <ChatComponent />
           ) : (
             <Stack
