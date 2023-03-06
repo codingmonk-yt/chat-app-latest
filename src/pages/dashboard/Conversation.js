@@ -71,7 +71,7 @@ const Conversation = ({ isMobile, menu }) => {
                     // Doc Message
                     <DocMsg el={el} menu={menu} />
                   );
-                case "link":
+                case "Link":
                   return (
                     //  Link Message
                     <LinkMsg el={el} menu={menu} />
