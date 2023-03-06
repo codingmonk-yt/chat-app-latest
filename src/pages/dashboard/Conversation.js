@@ -24,17 +24,10 @@ import { socket } from "../../socket";
 const Conversation = ({ isMobile, menu }) => {
   const dispatch = useDispatch();
 
-  const messageListRef = useRef(null);
-
   const { conversations, current_messages } = useSelector(
     (state) => state.conversation.direct_chat
   );
   const { room_id } = useSelector((state) => state.app);
-
-  useEffect(() => {
-    // Scroll to the bottom of the message list when new messages are added
-    messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
-  }, [current_messages]);
 
   useEffect(() => {
     const current = conversations.find((el) => el.id === room_id);
@@ -48,8 +41,8 @@ const Conversation = ({ isMobile, menu }) => {
     dispatch(SetCurrentConversation(current));
   }, []);
   return (
-    <Box p={isMobile ? 1 : 3} >
-      <Stack spacing={3} ref={messageListRef}>
+    <Box p={isMobile ? 1 : 3}>
+      <Stack spacing={3}>
         {current_messages.map((el, idx) => {
           switch (el.type) {
             case "divider":
@@ -103,6 +96,17 @@ const ChatComponent = () => {
   const isMobile = useResponsive("between", "md", "xs", "sm");
   const theme = useTheme();
 
+  const messageListRef = useRef(null);
+
+  const { current_messages } = useSelector(
+    (state) => state.conversation.direct_chat
+  );
+
+  useEffect(() => {
+    // Scroll to the bottom of the message list when new messages are added
+    messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+  }, [current_messages]);
+
   return (
     <Stack
       height={"100%"}
@@ -112,6 +116,7 @@ const ChatComponent = () => {
       {/*  */}
       <ChatHeader />
       <Box
+        ref={messageListRef}
         width={"100%"}
         sx={{
           position: "relative",
