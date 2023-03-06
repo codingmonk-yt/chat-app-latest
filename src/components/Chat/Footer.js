@@ -18,12 +18,12 @@ import {
   User,
 } from "phosphor-react";
 import { useTheme, styled } from "@mui/material/styles";
-import React from "react";
-import { useSearchParams } from "react-router-dom";
+import React, { useRef, useState } from "react";
 import useResponsive from "../../hooks/useResponsive";
 
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
+import { socket } from "../../socket";
 import { useSelector } from "react-redux";
 
 const StyledInput = styled(TextField)(({ theme }) => ({
@@ -66,11 +66,22 @@ const Actions = [
   },
 ];
 
-const ChatInput = ({ openPicker, setOpenPicker }) => {
+const ChatInput = ({
+  openPicker,
+  setOpenPicker,
+  setValue,
+  value,
+  inputRef,
+}) => {
   const [openActions, setOpenActions] = React.useState(false);
 
   return (
     <StyledInput
+      inputRef={inputRef}
+      value={value}
+      onChange={(event) => {
+        setValue(event.target.value);
+      }}
       fullWidth
       placeholder="Write a message..."
       variant="filled"
@@ -132,14 +143,55 @@ const ChatInput = ({ openPicker, setOpenPicker }) => {
   );
 };
 
+function linkify(text) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return text.replace(
+    urlRegex,
+    (url) => `<a href="${url}" target="_blank">${url}</a>`
+  );
+}
+
+function containsUrl(text) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return urlRegex.test(text);
+}
+
 const Footer = () => {
   const theme = useTheme();
 
+  const { current_conversation } = useSelector(
+    (state) => state.conversation.direct_chat
+  );
+
+  const user_id = window.localStorage.getItem("user_id");
+
   const isMobile = useResponsive("between", "md", "xs", "sm");
 
-  const {sideBar} = useSelector((state) => state.app);
+  const { sideBar, room_id } = useSelector((state) => state.app);
 
   const [openPicker, setOpenPicker] = React.useState(false);
+
+  const [value, setValue] = useState("");
+  const inputRef = useRef(null);
+
+  function handleEmojiClick(emoji) {
+    const input = inputRef.current;
+
+    if (input) {
+      const selectionStart = input.selectionStart;
+      const selectionEnd = input.selectionEnd;
+
+      setValue(
+        value.substring(0, selectionStart) +
+          emoji +
+          value.substring(selectionEnd)
+      );
+
+      // Move the cursor to the end of the inserted emoji
+      input.selectionStart = input.selectionEnd = selectionStart + 1;
+    }
+  }
+
   return (
     <Box
       sx={{
@@ -166,21 +218,25 @@ const Footer = () => {
                 position: "fixed",
                 display: openPicker ? "inline" : "none",
                 bottom: 81,
-                right: isMobile
-                  ? 20
-                  : sideBar.open
-                  ? 420
-                  : 100,
+                right: isMobile ? 20 : sideBar.open ? 420 : 100,
               }}
             >
               <Picker
                 theme={theme.palette.mode}
                 data={data}
-                onEmojiSelect={console.log}
+                onEmojiSelect={(emoji) => {
+                  handleEmojiClick(emoji.native);
+                }}
               />
             </Box>
             {/* Chat Input */}
-            <ChatInput openPicker={openPicker} setOpenPicker={setOpenPicker} />
+            <ChatInput
+              inputRef={inputRef}
+              value={value}
+              setValue={setValue}
+              openPicker={openPicker}
+              setOpenPicker={setOpenPicker}
+            />
           </Stack>
           <Box
             sx={{
@@ -195,7 +251,17 @@ const Footer = () => {
               alignItems={"center"}
               justifyContent="center"
             >
-              <IconButton>
+              <IconButton
+                onClick={() => {
+                  socket.emit("text_message", {
+                    message: linkify(value),
+                    conversation_id: room_id,
+                    from: user_id,
+                    to: current_conversation.user_id,
+                    type: containsUrl(value) ? "Link" : "Text",
+                  });
+                }}
+              >
                 <PaperPlaneTilt color="#ffffff" />
               </IconButton>
             </Stack>

@@ -1,5 +1,5 @@
 import { Stack, Box } from "@mui/material";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useTheme } from "@mui/material/styles";
 import { SimpleBarStyle } from "../../components/Scrollbar";
 
@@ -14,12 +14,43 @@ import {
   TextMsg,
   Timeline,
 } from "../../sections/dashboard/Conversation";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  FetchCurrentMessages,
+  SetCurrentConversation,
+} from "../../redux/slices/conversation";
+import { socket } from "../../socket";
 
 const Conversation = ({ isMobile, menu }) => {
+  const dispatch = useDispatch();
+
+  const messageListRef = useRef(null);
+
+  const { conversations, current_messages } = useSelector(
+    (state) => state.conversation.direct_chat
+  );
+  const { room_id } = useSelector((state) => state.app);
+
+  useEffect(() => {
+    // Scroll to the bottom of the message list when new messages are added
+    messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+  }, [current_messages]);
+
+  useEffect(() => {
+    const current = conversations.find((el) => el.id === room_id);
+
+    socket.emit("get_messages", { conversation_id: current.id }, (data) => {
+      // data => list of messages
+      console.log(data, "List of messages");
+      dispatch(FetchCurrentMessages({ messages: data }));
+    });
+
+    dispatch(SetCurrentConversation(current));
+  }, []);
   return (
-    <Box p={isMobile ? 1 : 3}>
-      <Stack spacing={3}>
-        {Chat_History.map((el, idx) => {
+    <Box p={isMobile ? 1 : 3} >
+      <Stack spacing={3} ref={messageListRef}>
+        {current_messages.map((el, idx) => {
           switch (el.type) {
             case "divider":
               return (
@@ -108,4 +139,4 @@ const ChatComponent = () => {
 
 export default ChatComponent;
 
-export {Conversation};
+export { Conversation };
