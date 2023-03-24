@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Avatar,
   Badge,
@@ -19,6 +19,7 @@ import { useSearchParams } from "react-router-dom";
 import useResponsive from "../../hooks/useResponsive";
 import { ToggleSidebar } from "../../redux/slices/app";
 import { useDispatch } from "react-redux";
+import CallDialog from "../../sections/dashboard/CallDialog";
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
@@ -69,6 +70,8 @@ const ChatHeader = () => {
   const isMobile = useResponsive("between", "md", "xs", "sm");
   const theme = useTheme();
 
+  const [openVoiceDialog, setOpenVoiceDialog] = useState(false);
+
   const [conversationMenuAnchorEl, setConversationMenuAnchorEl] =
     React.useState(null);
   const openConversationMenu = Boolean(conversationMenuAnchorEl);
@@ -79,110 +82,144 @@ const ChatHeader = () => {
     setConversationMenuAnchorEl(null);
   };
 
+  const handleOpenVoiceDialog = () => {
+    setOpenVoiceDialog(true);
+  };
+
+  const handleCloseVoiceDialog = () => {
+    setOpenVoiceDialog(false);
+  };
+
   return (
-    <Box
-      p={2}
-      width={"100%"}
-      sx={{
-        backgroundColor:
-          theme.palette.mode === "light" ? "#F8FAFF" : theme.palette.background,
-        boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.25)",
-      }}
-    >
-      <Stack
-        alignItems={"center"}
-        direction={"row"}
-        sx={{ width: "100%", height: "100%" }}
-        justifyContent="space-between"
+    <>
+      <Box
+        p={2}
+        width={"100%"}
+        sx={{
+          backgroundColor:
+            theme.palette.mode === "light"
+              ? "#F8FAFF"
+              : theme.palette.background,
+          boxShadow: "0px 0px 2px rgba(0, 0, 0, 0.25)",
+        }}
       >
         <Stack
-          onClick={() => {
-            dispatch(ToggleSidebar());
-          }}
-          spacing={2}
-          direction="row"
+          alignItems={"center"}
+          direction={"row"}
+          sx={{ width: "100%", height: "100%" }}
+          justifyContent="space-between"
         >
-          <Box>
-            <StyledBadge
-              overlap="circular"
+          <Stack
+            onClick={() => {
+              dispatch(ToggleSidebar());
+            }}
+            spacing={2}
+            direction="row"
+          >
+            <Box>
+              <StyledBadge
+                overlap="circular"
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "right",
+                }}
+                variant="dot"
+              >
+                <Avatar
+                  alt={faker.name.fullName()}
+                  src={faker.image.avatar()}
+                />
+              </StyledBadge>
+            </Box>
+            <Stack spacing={0.2}>
+              <Typography variant="subtitle2">
+                {faker.name.fullName()}
+              </Typography>
+              <Typography variant="caption">Online</Typography>
+            </Stack>
+          </Stack>
+          <Stack
+            direction={"row"}
+            alignItems="center"
+            spacing={isMobile ? 1 : 3}
+          >
+            <IconButton>
+              <VideoCamera />
+            </IconButton>
+            <IconButton
+              onClick={() => {
+                // open call Dialog Box
+                handleOpenVoiceDialog();
+              }}
+            >
+              <Phone />
+            </IconButton>
+            {!isMobile && (
+              <IconButton>
+                <MagnifyingGlass />
+              </IconButton>
+            )}
+            <Divider orientation="vertical" flexItem />
+            <IconButton
+              id="conversation-positioned-button"
+              aria-controls={
+                openConversationMenu
+                  ? "conversation-positioned-menu"
+                  : undefined
+              }
+              aria-haspopup="true"
+              aria-expanded={openConversationMenu ? "true" : undefined}
+              onClick={handleClickConversationMenu}
+            >
+              <CaretDown />
+            </IconButton>
+            <Menu
+              MenuListProps={{
+                "aria-labelledby": "fade-button",
+              }}
+              TransitionComponent={Fade}
+              id="conversation-positioned-menu"
+              aria-labelledby="conversation-positioned-button"
+              anchorEl={conversationMenuAnchorEl}
+              open={openConversationMenu}
+              onClose={handleCloseConversationMenu}
               anchorOrigin={{
                 vertical: "bottom",
                 horizontal: "right",
               }}
-              variant="dot"
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
             >
-              <Avatar alt={faker.name.fullName()} src={faker.image.avatar()} />
-            </StyledBadge>
-          </Box>
-          <Stack spacing={0.2}>
-            <Typography variant="subtitle2">{faker.name.fullName()}</Typography>
-            <Typography variant="caption">Online</Typography>
+              <Box p={1}>
+                <Stack spacing={1}>
+                  {Conversation_Menu.map((el) => (
+                    <MenuItem onClick={handleCloseConversationMenu}>
+                      <Stack
+                        sx={{ minWidth: 100 }}
+                        direction="row"
+                        alignItems={"center"}
+                        justifyContent="space-between"
+                      >
+                        <span>{el.title}</span>
+                      </Stack>{" "}
+                    </MenuItem>
+                  ))}
+                </Stack>
+              </Box>
+            </Menu>
           </Stack>
         </Stack>
-        <Stack direction={"row"} alignItems="center" spacing={isMobile ? 1 : 3}>
-          <IconButton>
-            <VideoCamera />
-          </IconButton>
-          <IconButton>
-            <Phone />
-          </IconButton>
-          {!isMobile && (
-            <IconButton>
-              <MagnifyingGlass />
-            </IconButton>
-          )}
+      </Box>
 
-          <Divider orientation="vertical" flexItem />
-          <IconButton
-            id="conversation-positioned-button"
-            aria-controls={
-              openConversationMenu ? "conversation-positioned-menu" : undefined
-            }
-            aria-haspopup="true"
-            aria-expanded={openConversationMenu ? "true" : undefined}
-            onClick={handleClickConversationMenu}
-          >
-            <CaretDown />
-          </IconButton>
-          <Menu
-            MenuListProps={{
-              "aria-labelledby": "fade-button",
-            }}
-            TransitionComponent={Fade}
-            id="conversation-positioned-menu"
-            aria-labelledby="conversation-positioned-button"
-            anchorEl={conversationMenuAnchorEl}
-            open={openConversationMenu}
-            onClose={handleCloseConversationMenu}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "right",
-            }}
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-          >
-            <Box p={1}>
-              <Stack spacing={1}>
-                {Conversation_Menu.map((el) => (
-                  <MenuItem onClick={handleCloseConversationMenu}>
-                    <Stack
-                      sx={{ minWidth: 100 }}
-                      direction="row"
-                      alignItems={"center"}
-                      justifyContent="space-between"
-                    >
-                      <span>{el.title}</span>
-                    </Stack>{" "}
-                  </MenuItem>
-                ))}
-              </Stack>
-            </Box>
-          </Menu>
-        </Stack>
-      </Stack>
-    </Box>
+      {openVoiceDialog && (
+        <CallDialog
+          open={openVoiceDialog}
+          handleClose={handleCloseVoiceDialog}
+        />
+      )}
+    </>
   );
 };
 

@@ -71,22 +71,6 @@ const DashboardLayout = () => {
         dispatch(SelectConversation({ room_id: data._id }));
       });
 
-      socket.on("open_chat", (data) => {
-        console.log(data);
-        // add / update to conversation list
-        const existing_conversation = conversations.find(
-          (el) => el.id === data._id
-        );
-        if (existing_conversation) {
-          // update direct conversation
-          dispatch(UpdateDirectConversation({ conversation: data }));
-        } else {
-          // add direct conversation
-          dispatch(AddDirectConversation({ conversation: data }));
-        }
-        dispatch(SelectConversation({ room_id: data._id }));
-      });
-
       socket.on("new_friend_request", (data) => {
         dispatch(
           showSnackbar({
@@ -115,7 +99,6 @@ const DashboardLayout = () => {
       socket?.off("new_friend_request");
       socket?.off("request_accepted");
       socket?.off("request_sent");
-      socket?.off("open_chat");
       socket?.off("start_chat");
       socket?.off("new_message");
     };
