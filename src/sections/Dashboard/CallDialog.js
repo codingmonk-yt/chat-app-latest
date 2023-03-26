@@ -24,7 +24,6 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const CallDialog = ({ open, handleClose }) => {
-
   const dispatch = useDispatch();
 
   //* Use params from call_details if available => like in case of receiver's end
@@ -59,6 +58,20 @@ const CallDialog = ({ open, handleClose }) => {
     if (reason && reason === "backdropClick") {
       return;
     } else {
+      dispatch(ResetAudioCallQueue());
+
+      // clean up event listners
+      socket?.off("call_accepted");
+      socket?.off("call_denied");
+      socket?.off("call_missed");
+
+      // stop publishing local audio stream to remote users, call the stopPublishingStream method with the corresponding stream ID passed to the streamID parameter.
+      zg.stopPublishingStream(streamID);
+      // stop playing a remote audio
+      zg.stopPlayingStream(userID);
+      // log out of the room
+      zg.logoutRoom(roomID);
+
       // handle Call Disconnection => this will be handled as cleanup when this dialog unmounts
 
       // at the end call handleClose Dialog
@@ -82,6 +95,7 @@ const CallDialog = ({ open, handleClose }) => {
     socket.on("call_missed", () => {
       // TODO => You can play an audio indicating call is missed at receiver's end
       // Abort call
+      handleDisconnect();
     });
 
     socket.on("call_accepted", () => {
@@ -93,6 +107,7 @@ const CallDialog = ({ open, handleClose }) => {
     socket.on("call_denied", () => {
       // TODO => You can play an audio indicating call is denined
       // ABORT CALL
+      handleDisconnect();
     });
 
     socket.emit("start_audio_call", {
@@ -271,25 +286,6 @@ const CallDialog = ({ open, handleClose }) => {
       .catch((err) => {
         console.log(err);
       });
-
-    return () => {
-
-      dispatch(ResetAudioCallQueue());
-
-      // clean up event listners
-      socket?.off("call_accepted");
-      socket?.off("call_denied");
-      socket?.off("call_missed");
-
-      // stop publishing local audio stream to remote users, call the stopPublishingStream method with the corresponding stream ID passed to the streamID parameter.
-      zg.stopPublishingStream(streamID);
-      // destroy local audio stream object created when calling the createStream method.
-      zg.destroyStream(localStream);
-      // stop playing a remote audio
-      zg.stopPlayingStream(userID);
-      // log out of the room
-      zg.logoutRoom(roomID);
-    };
   }, []);
 
   return (
