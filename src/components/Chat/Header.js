@@ -18,8 +18,9 @@ import { faker } from "@faker-js/faker";
 import { useSearchParams } from "react-router-dom";
 import useResponsive from "../../hooks/useResponsive";
 import { ToggleSidebar } from "../../redux/slices/app";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import CallDialog from "../../sections/dashboard/CallDialog";
+import { UpdateAudioCallDialog } from "../../redux/slices/audioCall";
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
@@ -70,7 +71,7 @@ const ChatHeader = () => {
   const isMobile = useResponsive("between", "md", "xs", "sm");
   const theme = useTheme();
 
-  const [openVoiceDialog, setOpenVoiceDialog] = useState(false);
+  const { open_audio_dialog } = useSelector((state) => state.audioCall);
 
   const [conversationMenuAnchorEl, setConversationMenuAnchorEl] =
     React.useState(null);
@@ -82,12 +83,12 @@ const ChatHeader = () => {
     setConversationMenuAnchorEl(null);
   };
 
-  const handleOpenVoiceDialog = () => {
-    setOpenVoiceDialog(true);
+  const handleOpenAudioDialog = () => {
+    dispatch(UpdateAudioCallDialog({ state: true }));
   };
 
-  const handleCloseVoiceDialog = () => {
-    setOpenVoiceDialog(false);
+  const handleCloseAudioDialog = () => {
+    dispatch(UpdateAudioCallDialog({ state: false }));
   };
 
   return (
@@ -149,7 +150,7 @@ const ChatHeader = () => {
             <IconButton
               onClick={() => {
                 // open call Dialog Box
-                handleOpenVoiceDialog();
+                handleOpenAudioDialog();
               }}
             >
               <Phone />
@@ -213,10 +214,10 @@ const ChatHeader = () => {
         </Stack>
       </Box>
 
-      {openVoiceDialog && (
+      {open_audio_dialog && (
         <CallDialog
-          open={openVoiceDialog}
-          handleClose={handleCloseVoiceDialog}
+          open={open_audio_dialog}
+          handleClose={handleCloseAudioDialog}
         />
       )}
     </>

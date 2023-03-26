@@ -11,9 +11,11 @@ import {
   AddDirectConversation,
   AddDirectMessage,
 } from "../../redux/slices/conversation";
+import CallNotification from "../../sections/dashboard/CallNotification";
 
 const DashboardLayout = () => {
   const isDesktop = useResponsive("up", "md");
+  const {open_notification_dialog} = useSelector((state) => state.audioCall);
   const { isLoggedIn } = useSelector((state) => state.auth);
   const { conversations, current_conversation } = useSelector(
     (state) => state.conversation.direct_chat
@@ -36,6 +38,15 @@ const DashboardLayout = () => {
       if (!socket) {
         connectSocket(user_id);
       }
+
+      socket.on("audio_call_notification", (data) => {
+
+        // TODO => dispatch an action to add this in call_queue
+
+        dispatch()
+
+        
+      });
 
       socket.on("new_message", (data) => {
         const message = data.message;
@@ -101,6 +112,7 @@ const DashboardLayout = () => {
       socket?.off("request_sent");
       socket?.off("start_chat");
       socket?.off("new_message");
+      socket?.off("audio_call_notification");
     };
   }, [isLoggedIn, socket]);
 
@@ -118,6 +130,7 @@ const DashboardLayout = () => {
 
         <Outlet />
       </Stack>
+      { open_notification_dialog && <CallNotification open={open_notification_dialog} />}
     </>
   );
 };

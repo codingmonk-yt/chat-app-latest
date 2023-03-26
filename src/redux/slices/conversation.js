@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from "../../utils/axios";
 import { faker } from "@faker-js/faker";
 
 const user_id = window.localStorage.getItem("user_id");

@@ -12,15 +12,25 @@ import {
 import { faker } from "@faker-js/faker";
 
 import { ZegoExpressEngine } from "zego-express-engine-webrtc";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import axiosInstance from "../../utils/axios";
+
+import { socket } from "../../socket";
+import { ResetAudioCallQueue } from "../../redux/slices/audioCall";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
 const CallDialog = ({ open, handleClose }) => {
+
+  const dispatch = useDispatch();
+
+  //* Use params from call_details if available => like in case of receiver's end
+
+  const [call_details] = useSelector((state) => state.audioCall.call_queue);
+
   const { direct_chat } = useSelector((state) => state.conversation);
   const { token, user_id } = useSelector((state) => state.auth);
 
@@ -34,16 +44,16 @@ const CallDialog = ({ open, handleClose }) => {
   // userID => ID of this user
   // userName => slug formed by user's name
 
-  const roomID = current_conversation.id;
-  const userID = user_id;
-  const userName = user_id;
+  const roomID = call_details?.roomID || current_conversation.id;
+  const userID = call_details?.userID || user_id;
+  const userName = call_details?.userName || user_id;
 
   // Step 1
 
   // Initialize the ZegoExpressEngine instance
   const zg = new ZegoExpressEngine(appID, server);
 
-  const streamID = current_conversation.user_id;
+  const streamID = call_details?.streamID || current_conversation.user_id;
 
   const handleDisconnect = (event, reason) => {
     if (reason && reason === "backdropClick") {
@@ -57,6 +67,40 @@ const CallDialog = ({ open, handleClose }) => {
   };
 
   useEffect(() => {
+    // TODO => emit audio_call event
+
+    // create a job to decline call automatically after 30 sec if not picked
+
+    const timer = setTimeout(() => {
+      // TODO => You can play an audio indicating missed call at this line at sender's end
+
+      socket.emit("audio_call_not_picked", {}, () => {
+        // TODO abort call => Call verdict will be marked as Missed
+      });
+    }, 30 * 1000);
+
+    socket.on("call_missed", () => {
+      // TODO => You can play an audio indicating call is missed at receiver's end
+      // Abort call
+    });
+
+    socket.on("call_accepted", () => {
+      // TODO => You can play an audio indicating call is started
+      // clear timeout for "audio_call_not_picked"
+      clearTimeout(timer);
+    });
+
+    socket.on("call_denied", () => {
+      // TODO => You can play an audio indicating call is denined
+      // ABORT CALL
+    });
+
+    socket.emit("start_audio_call", {
+      to: current_conversation.user_id,
+      from: userID,
+      roomID,
+    });
+
     let localStream;
 
     // make a POST API call to server & fetch token
@@ -229,6 +273,14 @@ const CallDialog = ({ open, handleClose }) => {
       });
 
     return () => {
+
+      dispatch(ResetAudioCallQueue());
+
+      // clean up event listners
+      socket?.off("call_accepted");
+      socket?.off("call_denied");
+      socket?.off("call_missed");
+
       // stop publishing local audio stream to remote users, call the stopPublishingStream method with the corresponding stream ID passed to the streamID parameter.
       zg.stopPublishingStream(streamID);
       // destroy local audio stream object created when calling the createStream method.
