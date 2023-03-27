@@ -87,9 +87,13 @@ const CallDialog = ({ open, handleClose }) => {
     const timer = setTimeout(() => {
       // TODO => You can play an audio indicating missed call at this line at sender's end
 
-      socket.emit("audio_call_not_picked", {}, () => {
-        // TODO abort call => Call verdict will be marked as Missed
-      });
+      socket.emit(
+        "audio_call_not_picked",
+        { to: current_conversation.user_id, from: userID },
+        () => {
+          // TODO abort call => Call verdict will be marked as Missed
+        }
+      );
     }, 30 * 1000);
 
     socket.on("call_missed", () => {
@@ -104,16 +108,18 @@ const CallDialog = ({ open, handleClose }) => {
       clearTimeout(timer);
     });
 
+    if (!call_details) {
+      socket.emit("start_audio_call", {
+        to: current_conversation.user_id,
+        from: userID,
+        roomID,
+      });
+    }
+
     socket.on("call_denied", () => {
       // TODO => You can play an audio indicating call is denined
       // ABORT CALL
       handleDisconnect();
-    });
-
-    socket.emit("start_audio_call", {
-      to: current_conversation.user_id,
-      from: userID,
-      roomID,
     });
 
     let localStream;
@@ -229,16 +235,20 @@ const CallDialog = ({ open, handleClose }) => {
               } `,
               JSON.stringify(userList)
             );
-            // const current_users = JSON.stringify(userList);
-            // * We can use current_users_list to build dynamic UI in a group call
-            const remoteStream = await zg.startPlayingStream(userID);
+            if (updateType === "left") {
+              handleDisconnect();
+            } else {
+              // const current_users = JSON.stringify(userList);
+              // * We can use current_users_list to build dynamic UI in a group call
+              const remoteStream = await zg.startPlayingStream(userID);
 
-            // Get the audio tag.
-            const remoteAudio = document.getElementById("remote-audio");
-            // The local stream is a MediaStream object. You can render audio by assigning the local stream to the srcObject property of video or audio.
+              // Get the audio tag.
+              const remoteAudio = document.getElementById("remote-audio");
+              // The local stream is a MediaStream object. You can render audio by assigning the local stream to the srcObject property of video or audio.
 
-            remoteAudio.srcObject = remoteStream;
-            remoteAudio.play();
+              remoteAudio.srcObject = remoteStream;
+              remoteAudio.play();
+            }
           });
 
           // Callback for updates on the status of the streams in the room.
@@ -302,21 +312,21 @@ const CallDialog = ({ open, handleClose }) => {
             <Stack>
               <Avatar
                 sx={{ height: 100, width: 100 }}
-                src={faker.image.image()}
+                src={faker.image.avatar()}
               />
               <audio id="local-audio" controls={false} />
             </Stack>
             <Stack>
               <Avatar
                 sx={{ height: 100, width: 100 }}
-                src={faker.image.image()}
+                src={faker.image.avatar()}
               />
               <audio id="remote-audio" controls={false} />
             </Stack>
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} variant="contained" color="error">
+          <Button onClick={handleDisconnect} variant="contained" color="error">
             End Call
           </Button>
         </DialogActions>

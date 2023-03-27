@@ -33,6 +33,7 @@ const slice = createSlice({
     },
     updateCallDialog(state, action) {
       state.open_audio_dialog = action.payload.state;
+      state.open_notification_dialog = false;
     },
   },
 });

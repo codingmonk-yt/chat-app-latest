@@ -49,13 +49,13 @@ const CallNotification = ({ open, handleClose }) => {
             <Stack>
               <Avatar
                 sx={{ height: 100, width: 100 }}
-                src={faker.image.image()}
+                src={faker.image.avatar()}
               />
             </Stack>
             <Stack>
               <Avatar
                 sx={{ height: 100, width: 100 }}
-                src={faker.image.image()}
+                src={faker.image.avatar()}
               />
             </Stack>
           </Stack>
