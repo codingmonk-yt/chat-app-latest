@@ -11,7 +11,7 @@ import {
   AddDirectConversation,
   AddDirectMessage,
 } from "../../redux/slices/conversation";
-import CallNotification from "../../sections/dashboard/CallNotification";
+import CallNotification from "../../sections/dashboard/Audio/CallNotification";
 import { PushToAudioCallQueue } from "../../redux/slices/audioCall";
 
 const DashboardLayout = () => {

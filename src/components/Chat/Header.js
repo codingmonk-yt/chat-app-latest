@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Avatar,
   Badge,
@@ -15,11 +15,10 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { CaretDown, MagnifyingGlass, Phone, VideoCamera } from "phosphor-react";
 import { faker } from "@faker-js/faker";
-import { useSearchParams } from "react-router-dom";
 import useResponsive from "../../hooks/useResponsive";
 import { ToggleSidebar } from "../../redux/slices/app";
 import { useDispatch, useSelector } from "react-redux";
-import CallDialog from "../../sections/dashboard/CallDialog";
+import CallDialog from "../../sections/dashboard/Audio/CallDialog";
 import { UpdateAudioCallDialog } from "../../redux/slices/audioCall";
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
