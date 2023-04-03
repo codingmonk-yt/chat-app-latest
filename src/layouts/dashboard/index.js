@@ -23,6 +23,7 @@ import { PushToVideoCallQueue, UpdateVideoCallDialog } from "../../redux/slices/
 
 const DashboardLayout = () => {
   const isDesktop = useResponsive("up", "md");
+  const {user_id} = useSelector((state) => state.auth);
   const { open_audio_notification_dialog, open_audio_dialog } = useSelector(
     (state) => state.audioCall
   );
@@ -41,8 +42,6 @@ const DashboardLayout = () => {
   const handleCloseVideoDialog = () => {
     dispatch(UpdateVideoCallDialog({ state: false }));
   };
-
-  const user_id = window.localStorage.getItem("user_id");
 
   useEffect(() => {
     if (isLoggedIn) {
