@@ -7,8 +7,10 @@ import { Profile_Menu } from "../../data";
 import { useDispatch, useSelector } from "react-redux";
 import { LogoutUser } from "../../redux/slices/auth";
 import { socket } from "../../socket";
+import { useNavigate } from "react-router-dom";
 
 const ProfileMenu = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
@@ -57,7 +59,13 @@ const ProfileMenu = () => {
               <MenuItem onClick={handleClose}>
                 <Stack
                   onClick={() => {
-                    if (idx === 2) {
+                    if(idx === 0) {
+                      navigate("/profile");
+                    }
+                    else if(idx === 1) {
+                      navigate("/settings");
+                    }
+                    else {
                       dispatch(LogoutUser());
                       socket.emit("end", {user_id});
                     }

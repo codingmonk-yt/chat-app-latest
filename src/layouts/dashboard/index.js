@@ -61,9 +61,9 @@ const DashboardLayout = () => {
 
       socket.on("audio_call_notification", (data) => {
         // TODO => dispatch an action to add this in call_queue
-
         dispatch(PushToAudioCallQueue(data));
       });
+      
       socket.on("video_call_notification", (data) => {
         // TODO => dispatch an action to add this in call_queue
         dispatch(PushToVideoCallQueue(data));

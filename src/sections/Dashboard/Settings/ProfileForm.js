@@ -7,17 +7,29 @@ import FormProvider from "../../../components/hook-form/FormProvider";
 import { RHFTextField, RHFUploadAvatar } from "../../../components/hook-form";
 import { Stack } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { FetchUserProfile, UpdateUserProfile } from "../../../redux/slices/app";
 
 const ProfileForm = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(FetchUserProfile());
+  }, []);
+
+  const { user } = useSelector((state) => state.app);
+
   const ProfileSchema = Yup.object().shape({
-    name: Yup.string().required("Name is required"),
+    firstName: Yup.string().required("Name is required"),
     about: Yup.string().required("About is required"),
-    avatarUrl: Yup.string().required("Avatar is required").nullable(true),
+    avatar: Yup.string().required("Avatar is required").nullable(true),
   });
 
   const defaultValues = {
-    name: "",
-    about: "",
+    firstName: user.firstName,
+    about: user.about,
+    avatar: user.avatar,
   };
 
   const methods = useForm({
@@ -40,6 +52,7 @@ const ProfileForm = () => {
     try {
       //   Send API request
       console.log("DATA", data);
+      dispatch(UpdateUserProfile(data));
     } catch (error) {
       console.error(error);
     }
@@ -54,7 +67,7 @@ const ProfileForm = () => {
       });
 
       if (file) {
-        setValue("avatarUrl", newFile, { shouldValidate: true });
+        setValue("avatar", newFile, { shouldValidate: true });
       }
     },
     [setValue]
@@ -63,16 +76,12 @@ const ProfileForm = () => {
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={4}>
-        <RHFUploadAvatar
-          name="avatarUrl"
-          maxSize={3145728}
-          onDrop={handleDrop}
-        />
+        <RHFUploadAvatar name="avatar" maxSize={3145728} onDrop={handleDrop} />
 
         <RHFTextField
           helperText={"This name is visible to your contacts"}
-          name="name"
-          label="Full Name"
+          name="firstName"
+          label="First Name"
         />
         <RHFTextField
           multiline
@@ -88,7 +97,7 @@ const ProfileForm = () => {
             size="large"
             type="submit"
             variant="contained"
-            loading={isSubmitSuccessful || isSubmitting}
+            // loading={isSubmitSuccessful || isSubmitting}
           >
             Save
           </LoadingButton>

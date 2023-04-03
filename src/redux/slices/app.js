@@ -1,9 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "../../utils/axios";
+import S3 from "../../utils/s3";
+import { uuid } from "uuidv4";
 
 // ----------------------------------------------------------------------
 
 const initialState = {
+  user: {},
   sideBar: {
     open: false,
     type: "CONTACT", // can be CONTACT, STARRED, SHARED
@@ -27,6 +30,12 @@ const slice = createSlice({
   name: "app",
   initialState,
   reducers: {
+    fetchUser(state, action) {
+      state.user = action.payload.user;
+    },
+    updateUser(state, action) {
+      state.user = action.payload.user;
+    },
     // Toggle Sidebar
     toggleSideBar(state) {
       state.sideBar.open = !state.sideBar.open;
@@ -104,7 +113,7 @@ export function UpdateSidebarType(type) {
 }
 export function UpdateTab(tab) {
   return async (dispatch, getState) => {
-    dispatch(slice.actions.updateTab({ tab }));
+    dispatch(slice.actions.updateTab(tab));
   };
 }
 
@@ -202,5 +211,65 @@ export function FetchFriendRequests() {
 export const SelectConversation = ({ room_id }) => {
   return async (dispatch, getState) => {
     dispatch(slice.actions.selectConversation({ room_id }));
+  };
+};
+
+export const FetchUserProfile = () => {
+  return async (dispatch, getState) => {
+    axios
+      .get("/user/get-me", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getState().auth.token}`,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        dispatch(slice.actions.fetchUser({ user: response.data.data }));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+};
+export const UpdateUserProfile = (formValues) => {
+  return async (dispatch, getState) => {
+    const file = formValues.avatar;
+
+    const key = uuid();
+
+    S3.getSignedUrl(
+      "putObject",
+      { Bucket: "codingmonk", Key: key, ContentType: `image/${file.type}` },
+      async (_err, presignedURL) => {
+        await fetch(presignedURL, {
+          method: "PUT",
+
+          body: file,
+
+          headers: {
+            "Content-Type": file.type,
+          },
+        });
+      }
+    );
+    axios
+      .patch(
+        "/user/update-me",
+        { ...formValues, avatar: key },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getState().auth.token}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response);
+        dispatch(slice.actions.updateUser({ user: response.data.data }));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 };

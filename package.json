@@ -16,6 +16,7 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "aws-sdk": "^2.1348.0",
     "axios": "^1.2.6",
     "emoji-mart": "^5.2.2",
     "framer-motion": "^7.5.3",
@@ -37,6 +38,7 @@
     "simplebar-react": "^2.4.3",
     "socket.io-client": "^4.6.0",
     "stylis-plugin-rtl": "^2.0.2",
+    "uuidv4": "^6.2.13",
     "web-vitals": "^2.1.4",
     "yup": "^0.32.11",
     "zego-express-engine-webrtc": "^2.23.0"
