@@ -16,6 +16,7 @@ const initialState = {
     message: null,
   },
   users: [], // all users of app who are not friends and not requested yet
+  all_users: [],
   friends: [], // all friends
   friendRequests: [], // all friend requests
   chat_type: null,
@@ -50,6 +51,9 @@ const slice = createSlice({
     },
     updateUsers(state, action) {
       state.users = action.payload.users;
+    },
+    updateAllUsers(state, action) {
+      state.all_users = action.payload.users;
     },
     updateFriends(state, action) {
       state.friends = action.payload.friends;
@@ -120,6 +124,28 @@ export function FetchUsers() {
       .then((response) => {
         console.log(response);
         dispatch(slice.actions.updateUsers({ users: response.data.data }));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+}
+export function FetchAllUsers() {
+  return async (dispatch, getState) => {
+    await axios
+      .get(
+        "/user/get-all-verified-users",
+
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getState().auth.token}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response);
+        dispatch(slice.actions.updateAllUsers({ users: response.data.data }));
       })
       .catch((err) => {
         console.log(err);

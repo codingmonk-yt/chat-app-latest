@@ -1,6 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
-  Avatar,
   Button,
   Dialog,
   DialogActions,
@@ -8,7 +7,6 @@ import {
   Slide,
   Stack,
 } from "@mui/material";
-import { faker } from "@faker-js/faker";
 import { ZegoExpressEngine } from "zego-express-engine-webrtc";
 import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "../../../utils/axios";
@@ -22,14 +20,15 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const CallDialog = ({ open, handleClose }) => {
   const dispatch = useDispatch();
 
+  const audioStreamRef = useRef(null);
+  const videoStreamRef = useRef(null);
+
   //* Use params from call_details if available => like in case of receiver's end
 
   const [call_details] = useSelector((state) => state.videoCall.call_queue);
+  const { incoming } = useSelector((state) => state.videoCall);
 
-  const { direct_chat } = useSelector((state) => state.conversation);
-  const { token, user_id } = useSelector((state) => state.auth);
-
-  const { current_conversation } = direct_chat;
+  const { token } = useSelector((state) => state.auth);
 
   const appID = 1642584767;
   const server = "wss://webliveroom1642584767-api.coolzcloud.com/ws";
@@ -39,41 +38,43 @@ const CallDialog = ({ open, handleClose }) => {
   // userID => ID of this user
   // userName => slug formed by user's name
 
-  const roomID = call_details?.roomID || current_conversation.id;
-  const userID = call_details?.userID || user_id;
-  const userName = call_details?.userName || user_id;
+  const roomID = call_details?.roomID;
+  const userID = call_details?.userID;
+  const userName = call_details?.userName;
 
   // Step 1
 
   // Initialize the ZegoExpressEngine instance
   const zg = new ZegoExpressEngine(appID, server);
 
-  const audioStreamID = `audio_${call_details?.streamID || current_conversation.user_id}`;
-  const videoStreamID = `video_${call_details?.streamID || current_conversation.user_id}`;
+  const audioStreamID = `audio_${call_details?.streamID}`;
+  const videoStreamID = `video_${call_details?.streamID}`;
 
   const handleDisconnect = (event, reason) => {
     if (reason && reason === "backdropClick") {
       return;
     } else {
-      dispatch(ResetVideoCallQueue());
-
       // clean up event listners
       socket?.off("video_call_accepted");
       socket?.off("video_call_denied");
       socket?.off("video_call_missed");
 
       // stop publishing local audio & video stream to remote users, call the stopPublishingStream method with the corresponding stream ID passed to the streamID parameter.
+
       zg.stopPublishingStream(audioStreamID);
       zg.stopPublishingStream(videoStreamID);
       // stop playing a remote audio
       zg.stopPlayingStream(`audio_${userID}`);
       zg.stopPlayingStream(`video_${userID}`);
+      zg.destroyStream(audioStreamRef.current);
+      zg.destroyStream(videoStreamRef.current);
       // log out of the room
       zg.logoutRoom(roomID);
 
       // handle Call Disconnection => this will be handled as cleanup when this dialog unmounts
 
       // at the end call handleClose Dialog
+      dispatch(ResetVideoCallQueue());
       handleClose();
     }
   };
@@ -88,7 +89,7 @@ const CallDialog = ({ open, handleClose }) => {
 
       socket.emit(
         "video_call_not_picked",
-        { to: current_conversation.user_id, from: userID },
+        { from: call_details?.streamID, to: userID },
         () => {
           // TODO abort call => Call verdict will be marked as Missed
         }
@@ -107,10 +108,10 @@ const CallDialog = ({ open, handleClose }) => {
       clearTimeout(timer);
     });
 
-    if (!call_details) {
+    if (!incoming) {
       socket.emit("start_video_call", {
-        to: current_conversation.user_id,
-        from: userID,
+        from: call_details?.streamID,
+        to: userID,
         roomID,
       });
     }
@@ -120,9 +121,6 @@ const CallDialog = ({ open, handleClose }) => {
       // ABORT CALL
       handleDisconnect();
     });
-
-    let localAudioStream;
-    let localVideoStream;
 
     // make a POST API call to server & fetch token
 
@@ -166,9 +164,9 @@ const CallDialog = ({ open, handleClose }) => {
         // }
         console.log(result);
 
-        const { webRTC, microphone } = result;
+        const { webRTC, microphone, camera } = result;
 
-        if (webRTC && microphone) {
+        if (webRTC && microphone && camera) {
           zg.loginRoom(
             roomID,
             this_token,
@@ -179,12 +177,15 @@ const CallDialog = ({ open, handleClose }) => {
               console.log(result);
 
               // After calling the CreateStream method, you need to wait for the ZEGOCLOUD server to return the local stream object before any further operation.
-              localAudioStream = await zg.createStream({
+              const localAudioStream = await zg.createStream({
                 camera: { audio: true, video: false },
               });
-              localVideoStream = await zg.createStream({
+              const localVideoStream = await zg.createStream({
                 camera: { audio: false, video: true },
               });
+
+              audioStreamRef.current = localAudioStream;
+              videoStreamRef.current = localVideoStream;
 
               // Get the audio tag.
               const localAudio = document.getElementById("local-audio");
@@ -248,8 +249,12 @@ const CallDialog = ({ open, handleClose }) => {
             } else {
               // const current_users = JSON.stringify(userList);
               // * We can use current_users_list to build dynamic UI in a group call
-              const remoteAudioStream = await zg.startPlayingStream(`audio_${userID}`);
-              const remoteVideoStream = await zg.startPlayingStream(`video_${userID}`);
+              const remoteAudioStream = await zg.startPlayingStream(
+                `audio_${userID}`
+              );
+              const remoteVideoStream = await zg.startPlayingStream(
+                `video_${userID}`
+              );
 
               // Get the audio tag.
               const remoteAudio = document.getElementById("remote-audio");
@@ -322,12 +327,8 @@ const CallDialog = ({ open, handleClose }) => {
         <DialogContent>
           <Stack direction="row" spacing={24} p={2}>
             <Stack>
-              <Avatar
-                sx={{ height: 100, width: 100 }}
-                src={faker.image.avatar()}
-              />
               <video
-                style={{ height: 100, width: 100 }}
+                style={{ height: 200, width: 200 }}
                 id="local-video"
                 controls={false}
               />
@@ -335,7 +336,7 @@ const CallDialog = ({ open, handleClose }) => {
             </Stack>
             <Stack>
               <video
-                style={{ height: 100, width: 100 }}
+                style={{ height: 200, width: 200 }}
                 id="remote-video"
                 controls={false}
               />
@@ -344,7 +345,13 @@ const CallDialog = ({ open, handleClose }) => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDisconnect} variant="contained" color="error">
+          <Button
+            onClick={() => {
+              handleDisconnect();
+            }}
+            variant="contained"
+            color="error"
+          >
             End Call
           </Button>
         </DialogActions>
