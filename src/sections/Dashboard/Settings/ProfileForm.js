@@ -1,29 +1,24 @@
 import React, { useCallback } from "react";
 import * as Yup from "yup";
 // form
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider from "../../../components/hook-form/FormProvider";
 import { RHFTextField, RHFUploadAvatar } from "../../../components/hook-form";
 import { Stack } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
-import { FetchUserProfile, UpdateUserProfile } from "../../../redux/slices/app";
+import { UpdateUserProfile } from "../../../redux/slices/app";
 
 const ProfileForm = () => {
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(FetchUserProfile());
-  }, []);
 
   const { user } = useSelector((state) => state.app);
 
   const ProfileSchema = Yup.object().shape({
     firstName: Yup.string().required("Name is required"),
     about: Yup.string().required("About is required"),
-    avatar: Yup.string().required("Avatar is required").nullable(true),
+    avatar: Yup.string().required('Avatar is required').nullable(true),
   });
 
   const defaultValues = {
@@ -83,13 +78,7 @@ const ProfileForm = () => {
           name="firstName"
           label="First Name"
         />
-        <RHFTextField
-          multiline
-          rows={4}
-          maxRows={5}
-          name="about"
-          label="About"
-        />
+        <RHFTextField multiline rows={4} name="about" label="About" />
 
         <Stack direction={"row"} justifyContent="end">
           <LoadingButton
