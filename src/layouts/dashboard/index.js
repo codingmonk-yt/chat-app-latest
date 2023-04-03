@@ -66,7 +66,6 @@ const DashboardLayout = () => {
       });
       socket.on("video_call_notification", (data) => {
         // TODO => dispatch an action to add this in call_queue
-        alert("got notification for video call")
         dispatch(PushToVideoCallQueue(data));
       });
 

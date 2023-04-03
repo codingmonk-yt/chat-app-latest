@@ -89,7 +89,7 @@ const CallDialog = ({ open, handleClose }) => {
 
       socket.emit(
         "video_call_not_picked",
-        { from: call_details?.streamID, to: userID },
+        { to: call_details?.streamID, from: userID },
         () => {
           // TODO abort call => Call verdict will be marked as Missed
         }
@@ -110,8 +110,8 @@ const CallDialog = ({ open, handleClose }) => {
 
     if (!incoming) {
       socket.emit("start_video_call", {
-        from: call_details?.streamID,
-        to: userID,
+        to: call_details?.streamID,
+        from: userID,
         roomID,
       });
     }
@@ -244,7 +244,8 @@ const CallDialog = ({ open, handleClose }) => {
               } `,
               JSON.stringify(userList)
             );
-            if (updateType === "left") {
+            if (updateType !== "ADD") {
+              
               handleDisconnect();
             } else {
               // const current_users = JSON.stringify(userList);
