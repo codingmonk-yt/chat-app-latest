@@ -97,7 +97,9 @@ const SideBar = () => {
                   p={1}
                 >
                   <IconButton
-                    onClick={() => {}}
+                    onClick={() => {
+                      handleChangeTab(el.index);
+                    }}
                     sx={{ width: "max-content", color: "#ffffff" }}
                   >
                     {el.icon}
@@ -132,7 +134,7 @@ const SideBar = () => {
                 >
                   <IconButton
                     onClick={() => {
-                      // dispatch(UpdateTab(el.index));
+                      handleChangeTab(el.index);
                     }}
                     sx={{ width: "max-content", color: "#ffffff" }}
                   >

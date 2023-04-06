@@ -4,7 +4,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import useResponsive from "../../hooks/useResponsive";
 import SideNav from "./SideNav";
 import { useDispatch, useSelector } from "react-redux";
-import { SelectConversation, showSnackbar } from "../../redux/slices/app";
+import { FetchUserProfile, SelectConversation, showSnackbar } from "../../redux/slices/app";
 import { socket, connectSocket } from "../../socket";
 import {
   UpdateDirectConversation,
@@ -23,6 +23,7 @@ import { PushToVideoCallQueue, UpdateVideoCallDialog } from "../../redux/slices/
 
 const DashboardLayout = () => {
   const isDesktop = useResponsive("up", "md");
+  const dispatch = useDispatch();
   const {user_id} = useSelector((state) => state.auth);
   const { open_audio_notification_dialog, open_audio_dialog } = useSelector(
     (state) => state.audioCall
@@ -34,7 +35,11 @@ const DashboardLayout = () => {
   const { conversations, current_conversation } = useSelector(
     (state) => state.conversation.direct_chat
   );
-  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(FetchUserProfile());
+  }, []);
+  
 
   const handleCloseAudioDialog = () => {
     dispatch(UpdateAudioCallDialog({ state: false }));

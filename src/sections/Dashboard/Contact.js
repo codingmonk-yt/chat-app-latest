@@ -28,7 +28,7 @@ import {
 } from "phosphor-react";
 import useResponsive from "../../hooks/useResponsive";
 import AntSwitch from "../../components/AntSwitch";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ToggleSidebar, UpdateSidebarType } from "../../redux/slices/app";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -83,6 +83,8 @@ const DeleteChatDialog = ({ open, handleClose }) => {
 
 const Contact = () => {
   const dispatch = useDispatch();
+
+  const {current_conversation} = useSelector((state) => state.conversation.direct_chat);
 
   const theme = useTheme();
 
@@ -140,13 +142,13 @@ const Contact = () => {
         >
           <Stack alignItems="center" direction="row" spacing={2}>
             <Avatar
-              src={faker.image.avatar()}
-              alt={faker.name.firstName()}
+              src={current_conversation?.img}
+              alt={current_conversation?.name}
               sx={{ height: 64, width: 64 }}
             />
             <Stack spacing={0.5}>
               <Typography variant="article" fontWeight={600}>
-                {faker.name.fullName()}
+                {current_conversation?.name}
               </Typography>
               <Typography variant="body2" fontWeight={500}>
                 {"+91 62543 28 739"}
@@ -169,7 +171,6 @@ const Contact = () => {
               <IconButton>
                 <VideoCamera />
               </IconButton>
-
               <Typography variant="overline">Video</Typography>
             </Stack>
           </Stack>
@@ -179,7 +180,7 @@ const Contact = () => {
               About
             </Typography>
             <Typography variant="body2" fontWeight={500}>
-              {"Imagination is the only limit"}
+              {current_conversation?.about}
             </Typography>
           </Stack>
           <Divider />

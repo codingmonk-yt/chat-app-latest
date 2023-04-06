@@ -7,9 +7,11 @@ import { FetchUserProfile } from "../../../redux/slices/app";
 
 const Profile = () => {
   const dispatch = useDispatch();
+  
   useEffect(() => {
     dispatch(FetchUserProfile());
   }, []);
+
   return (
     <>
       <Stack direction="row" sx={{ width: "100%" }}>

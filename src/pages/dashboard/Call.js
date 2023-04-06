@@ -7,7 +7,7 @@ import {
   Link,
 } from "@mui/material";
 import { MagnifyingGlass, Phone } from "phosphor-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Search,
   SearchIconWrapper,
@@ -16,19 +16,25 @@ import {
 
 import { useTheme } from "@mui/material/styles";
 import { SimpleBarStyle } from "../../components/Scrollbar";
-import {CallLogElement} from "../../components/CallElement";
-import { CallList } from "../../data";
+import { CallLogElement } from "../../components/CallElement";
 import StartCall from "../../sections/dashboard/StartCall";
+import { useDispatch, useSelector } from "react-redux";
+import { FetchCallLogs } from "../../redux/slices/app";
 
 const Call = () => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(FetchCallLogs());
+  }, []);
+  const { call_logs } = useSelector((state) => state.app);
   const [openDialog, setOpenDialog] = useState(false);
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-  }
+  };
   const handleOpenDialog = () => {
     setOpenDialog(true);
-  }
+  };
   const theme = useTheme();
   return (
     <>
@@ -86,7 +92,7 @@ const Call = () => {
             <Stack sx={{ flexGrow: 1, overflow: "scroll", height: "100%" }}>
               <SimpleBarStyle timeout={500} clickOnTrack={false}>
                 <Stack spacing={2.4}>
-                  {CallList.map((el, idx) => {
+                  {call_logs.map((el, idx) => {
                     return <CallLogElement key={idx} {...el} />;
                   })}
                 </Stack>
@@ -95,7 +101,9 @@ const Call = () => {
           </Stack>
         </Box>
       </Stack>
-      {openDialog && <StartCall open={openDialog} handleClose={handleCloseDialog} />}
+      {openDialog && (
+        <StartCall open={openDialog} handleClose={handleCloseDialog} />
+      )}
     </>
   );
 };
