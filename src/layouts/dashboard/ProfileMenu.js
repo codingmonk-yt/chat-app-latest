@@ -25,7 +25,7 @@ const ProfileMenu = () => {
 
   const user_id = window.localStorage.getItem("user_id");
 
-  const user_name = user.firstName;
+  const user_name = user?.firstName;
   const user_img = `https://${S3_BUCKET_NAME}.s3.${AWS_S3_REGION}.amazonaws.com/${user?.avatar}`;
 
   return (

@@ -30,9 +30,9 @@ const Conversation = ({ isMobile, menu }) => {
   const { room_id } = useSelector((state) => state.app);
 
   useEffect(() => {
-    const current = conversations.find((el) => el.id === room_id);
+    const current = conversations.find((el) => el?.id === room_id);
 
-    socket.emit("get_messages", { conversation_id: current.id }, (data) => {
+    socket.emit("get_messages", { conversation_id: current?.id }, (data) => {
       // data => list of messages
       console.log(data, "List of messages");
       dispatch(FetchCurrentMessages({ messages: data }));

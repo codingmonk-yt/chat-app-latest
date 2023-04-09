@@ -77,7 +77,7 @@ const DashboardLayout = () => {
         const message = data.message;
         console.log(current_conversation, data);
         // check if msg we got is from currently selected conversation
-        if (current_conversation.id === data.conversation_id) {
+        if (current_conversation?.id === data.conversation_id) {
           dispatch(
             AddDirectMessage({
               id: message._id,
@@ -95,7 +95,7 @@ const DashboardLayout = () => {
         console.log(data);
         // add / update to conversation list
         const existing_conversation = conversations.find(
-          (el) => el.id === data._id
+          (el) => el?.id === data._id
         );
         if (existing_conversation) {
           // update direct conversation

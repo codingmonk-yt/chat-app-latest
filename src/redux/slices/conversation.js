@@ -24,15 +24,15 @@ const slice = createSlice({
         );
         return {
           id: el._id,
-          user_id: user._id,
-          name: `${user.firstName} ${user.lastName}`,
-          online: user.status === "Online",
+          user_id: user?._id,
+          name: `${user?.firstName} ${user?.lastName}`,
+          online: user?.status === "Online",
           img: `https://${S3_BUCKET_NAME}.s3.${AWS_S3_REGION}.amazonaws.com/${user?.avatar}`,
           msg: el.messages.slice(-1)[0].text, 
           time: "9:36",
           unread: 0,
           pinned: false,
-          about: user.about,
+          about: user?.about,
         };
       });
 
@@ -42,7 +42,7 @@ const slice = createSlice({
       const this_conversation = action.payload.conversation;
       state.direct_chat.conversations = state.direct_chat.conversations.map(
         (el) => {
-          if (el.id !== this_conversation._id) {
+          if (el?.id !== this_conversation._id) {
             return el;
           } else {
             const user = this_conversation.participants.find(
@@ -50,9 +50,9 @@ const slice = createSlice({
             );
             return {
               id: this_conversation._id._id,
-              user_id: user._id,
-              name: `${user.firstName} ${user.lastName}`,
-              online: user.status === "Online",
+              user_id: user?._id,
+              name: `${user?.firstName} ${user?.lastName}`,
+              online: user?.status === "Online",
               img: faker.image.avatar(),
               msg: faker.music.songName(),
               time: "9:36",
@@ -69,13 +69,13 @@ const slice = createSlice({
         (elm) => elm._id.toString() !== user_id
       );
       state.direct_chat.conversations = state.direct_chat.conversations.filter(
-        (el) => el.id !== this_conversation._id
+        (el) => el?.id !== this_conversation._id
       );
       state.direct_chat.conversations.push({
         id: this_conversation._id._id,
-        user_id: user._id,
-        name: `${user.firstName} ${user.lastName}`,
-        online: user.status === "Online",
+        user_id: user?._id,
+        name: `${user?.firstName} ${user?.lastName}`,
+        online: user?.status === "Online",
         img: faker.image.avatar(),
         msg: faker.music.songName(),
         time: "9:36",
